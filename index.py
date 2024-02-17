@@ -97,6 +97,8 @@ def main():
                 run = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if not can_play:
+                    return
                 mx, my = pygame.mouse.get_pos()
                 if attack_btn.is_press(mx, my, [cur_sequence]):
                     cur_type = -1
@@ -113,19 +115,15 @@ def main():
                         continue
                     if cell in cur_sequence_set:
                         continue
-                    if cell not in cur_sequence_set and (cur_type == cell.item.type or cur_type == -1): 
-                        print(cell.item.type)
-                        print(cell.item.image_selected)
-                        print(cell.item.type)
+                    if cur_type == cell.item.type or cur_type == -1: 
                         cell.item.image = cell.item.image_selected
-                        cur_type = cell.item
+                        cur_type = cell.item.type
                         cur_position = cell.pos
                         cur_sequence.append(cell)
                         cur_sequence_set.add(cell)
                         close_cells = Close.get_close(grid, cur_position, ROWS, COLS)
             if event.type == Events.DEADTH_EVENT:
-                #TODO:end game
-                pass
+                can_play = False
             
         win.blit(MAIN_BG, (190, 100))
         win.blit(GAME_NAME, ((WIDTH / 2) - (GAME_NAME.get_rect().width / 2), 130))
