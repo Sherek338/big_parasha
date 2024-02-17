@@ -2,7 +2,7 @@ import pygame
 import random
 
 
-WIDTH, HEIGHT = 800, 800
+WIDTH, HEIGHT = 1920, 1080
 ROWS, COLS = 8, 8
 BLOCK_SIZE = WIDTH//COLS
 
