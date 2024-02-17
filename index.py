@@ -20,8 +20,6 @@ pygame.display.init()
 
 win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
 
-COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255), (0, 255, 255)]
-
 # LVL_MUSIC = pygame.mixer.music.load("./assets/ost/lvl_theme.wav")
 # pygame.mixer.music.play(100, 0, 0)
 
@@ -51,15 +49,21 @@ def on_attack(props):
     cur_sequence = props[0]
     for cell in cur_sequence:
         all_sprites.remove(cell.item)
+        x, y = cell.pos
+        enemy = Enemy.EnemyClass(random.randint(1, 4), (x * BLOCK_SIZE + CENTER_MARGIN_X, y * BLOCK_SIZE + CENTER_MARGIN_Y), (BLOCK_SIZE, BLOCK_SIZE))
+        grid[y][x] = Cell.CellClass(enemy, (x, y))
+        all_sprites.add(enemy)
+
+    cur_sequence = []
 
 def main():
     clock = pygame.time.Clock()
     
     cur_type = -1
     cur_position = (4, 5)
-    draw_grid(grid, cur_position)
     cur_sequence = [grid[5][4]]
-    cur_sequence_set = set(cur_sequence)
+    
+    draw_grid(grid, cur_position)
 
     attack_btn = Button.ButtonClass((1350, 800), ATTACK_BTN, on_attack, font_attack.render("АТАКОВАТЬ", 1, (255, 255, 255)))
     lvl_label = font_lvl.render("УРОВЕНЬ 1", 1, (0, 0, 0))
@@ -77,7 +81,8 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
-                attack_btn.is_press(mx, my, [cur_sequence_set])
+                attack_btn.is_press(mx, my, [cur_sequence])
+                cur_sequence_set = set(cur_sequence)
                 for cell in close_cells:
                     if not cell.is_mouse_over(mx, my): 
                         continue
