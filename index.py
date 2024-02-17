@@ -20,13 +20,17 @@ pygame.display.init()
 
 win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
 
-# LVL_MUSIC = pygame.mixer.music.load("./assets/ost/lvl_theme.wav")
-# pygame.mixer.music.play(100, 0, 0)
+LVL_MUSIC = pygame.mixer.music.load("./assets/ost/lvl_theme.wav")
+pygame.mixer.music.play(100, 0, 0)
 
 MAIN_BG = pygame.transform.scale(pygame.image.load("./assets/sprites/main_bg.png").convert(), (1550, 900))
 ATTACK_BTN = pygame.image.load("./assets/sprites/attack_btn.png").convert_alpha()
+ORNAMENT = pygame.image.load("./assets/sprites/orn.png").convert_alpha()
+HEART_FULL = pygame.image.load("./assets/sprites/HP_FULL.png").convert_alpha()
+HEART_LOST = pygame.image.load("./assets/sprites/HP_LOST.png").convert_alpha()
+GAME_NAME = pygame.image.load("./assets/sprites/NAME.png").convert_alpha()
+
 font_attack = pygame.font.Font("./assets/fonts/Inter-Regular.ttf", 32)
-font_lvl = pygame.font.Font("./assets/fonts/Inter-Bold.ttf",38) 
 
 grid = [[0 for _ in range(COLS)] for _ in range(ROWS)]
 
@@ -41,34 +45,47 @@ def draw_grid(grid, pos):
                 all_sprites.add(hero)
                 grid[i][j] = Cell.CellClass(hero, (j, i))
                 continue
-            enemy = Enemy.EnemyClass(random.randint(1, 4), (j * BLOCK_SIZE + CENTER_MARGIN_X, i * BLOCK_SIZE + CENTER_MARGIN_Y), (BLOCK_SIZE, BLOCK_SIZE))
+            enemy = Enemy.EnemyClass(random.randint(1, 3), (j * BLOCK_SIZE + CENTER_MARGIN_X, i * BLOCK_SIZE + CENTER_MARGIN_Y), (BLOCK_SIZE, BLOCK_SIZE))
             all_sprites.add(enemy)
             grid[i][j] = Cell.CellClass(enemy, (j, i))
 
 def on_attack(props):
     cur_sequence = props[0]
-    for cell in cur_sequence:
+    if len(cur_sequence) < 2:
+        return
+    hero_cell = cur_sequence[len(cur_sequence) - 1:][0]
+    herx, hery = hero_cell.pos
+    hero = Hero.HeroClass((herx * BLOCK_SIZE + CENTER_MARGIN_X, hery * BLOCK_SIZE + CENTER_MARGIN_Y), (BLOCK_SIZE, BLOCK_SIZE))
+    all_sprites.remove(hero_cell.item)
+    all_sprites.add(hero)
+    grid[hery][herx] = Cell.CellClass(hero, (herx, hery))
+    for cell in cur_sequence[0:len(cur_sequence) - 1]:
         all_sprites.remove(cell.item)
         x, y = cell.pos
-        enemy = Enemy.EnemyClass(random.randint(1, 4), (x * BLOCK_SIZE + CENTER_MARGIN_X, y * BLOCK_SIZE + CENTER_MARGIN_Y), (BLOCK_SIZE, BLOCK_SIZE))
+        enemy = Enemy.EnemyClass(random.randint(1, 3), (x * BLOCK_SIZE + CENTER_MARGIN_X, y * BLOCK_SIZE + CENTER_MARGIN_Y), (BLOCK_SIZE, BLOCK_SIZE))
         grid[y][x] = Cell.CellClass(enemy, (x, y))
         all_sprites.add(enemy)
-
-    cur_sequence = []
 
 def main():
     clock = pygame.time.Clock()
     
+    hp = 3
+    
     cur_type = -1
     cur_position = (4, 5)
-    cur_sequence = [grid[5][4]]
     
     draw_grid(grid, cur_position)
+    
+    cur_sequence = [grid[5][4]]
+    cur_sequence_set = set(cur_sequence)
+    
+    heart_pos = [(250, 720), (250, 500), (250, 270)]    
 
     attack_btn = Button.ButtonClass((1350, 800), ATTACK_BTN, on_attack, font_attack.render("АТАКОВАТЬ", 1, (255, 255, 255)))
-    lvl_label = font_lvl.render("УРОВЕНЬ 1", 1, (0, 0, 0))
     
     all_sprites.add(attack_btn)
+    
+    can_play = True
     
     close_cells = Close.get_close(grid, cur_position, ROWS, COLS)
     run = True
@@ -81,24 +98,27 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
-                attack_btn.is_press(mx, my, [cur_sequence])
-                cur_sequence_set = set(cur_sequence)
+                if attack_btn.is_press(mx, my, [cur_sequence]):
+                    cur_type = -1
+                    x, y = cur_position
+                    cur_sequence = [grid[y][x]]
+                    cur_sequence_set = set(cur_sequence)
+                    for cell in close_cells:
+                        if cell.item.is_angry:
+                            hp -= 1
+                            if hp <= 0:
+                                pygame.event.post(pygame.event.Event(Events.DEADTH_EVENT)) 
                 for cell in close_cells:
                     if not cell.is_mouse_over(mx, my): 
                         continue
                     if cell in cur_sequence_set:
-                        #TODO:path back
-                        # if cur_sequence.index(cell) == len(cur_sequence) - 2:
-                        #     last_cell = cur_sequence[len(cur_sequence) - 1]
-                        #     cur_sequence_set.remove(cell)
-                        #     cur_sequence.remove(cell)
-                        #     cur_sequence[len(cur_sequence) - 1].set_default()
-                        #     cur_position = last_cell.pos
-                        #     cur_type = last_cell.item.type
-                            continue
+                        continue
                     if cell not in cur_sequence_set and (cur_type == cell.item.type or cur_type == -1): 
-                        cell.item.image.fill((0,0,0))
-                        cur_type = cell.item.type
+                        print(cell.item.type)
+                        print(cell.item.image_selected)
+                        print(cell.item.type)
+                        cell.item.image = cell.item.image_selected
+                        cur_type = cell.item
                         cur_position = cell.pos
                         cur_sequence.append(cell)
                         cur_sequence_set.add(cell)
@@ -108,12 +128,23 @@ def main():
                 pass
             
         win.blit(MAIN_BG, (190, 100))
-        win.blit(lvl_label, ((WIDTH / 2) - (lvl_label.get_rect().width / 2), 130))
+        win.blit(GAME_NAME, ((WIDTH / 2) - (GAME_NAME.get_rect().width / 2), 130))
+        win.blit(ORNAMENT, (1420, 150))
+        
+        count = 0
+        for pos in heart_pos:
+            if count < hp:
+                count += 1
+                win.blit(HEART_FULL, pos)
+            else:
+                win.blit(HEART_LOST, pos)
+                
+        
         all_sprites.draw(win)
         
         for cell in close_cells:
             if cell in cur_sequence_set:
-                cell.item.image.fill((0,0,0))
+                cell.item.image = cell.item.image_selected
         
         all_sprites.update()
         

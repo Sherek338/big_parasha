@@ -17,3 +17,5 @@ def get_close(grid, pos, row_count, col_count) -> list:
             
     return close_cells
 
+def get_col():
+    pass
