@@ -1,9 +1,12 @@
 import pygame
+import random
 
 class EnemyClass(pygame.sprite.Sprite):
     def __init__(self, type, pos, size):
         super().__init__()
         self.type = type
+        self.psevdo = 5
+        self.is_angry = False
         
         self.image = pygame.Surface(size) # None
         
@@ -24,3 +27,9 @@ class EnemyClass(pygame.sprite.Sprite):
         
     def update(self):
         self.image = self.image
+        if random.randint(0, 100) < self.psevdo:
+            self.psevdo = 0
+            self.is_angry = True
+            return
+        self.psevdo += 3
+        

@@ -25,6 +25,10 @@ win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE | pygame.DOUBLEB
 
 MAIN_BG = pygame.transform.scale(pygame.image.load("./assets/sprites/main_bg.png").convert(), (1550, 900))
 ATTACK_BTN = pygame.image.load("./assets/sprites/attack_btn.png").convert_alpha()
+ORNAMENT = pygame.image.load("./assets/sprites/orn.png").convert_alpha()
+HEART_FULL = pygame.image.load("./assets/sprites/HP_FULL.png").convert_alpha()
+HEART_LOST = pygame.image.load("./assets/sprites/HP_LOST.png").convert_alpha()
+
 font_attack = pygame.font.Font("./assets/fonts/Inter-Regular.ttf", 32)
 font_lvl = pygame.font.Font("./assets/fonts/Inter-Bold.ttf",38) 
 
@@ -47,23 +51,30 @@ def draw_grid(grid, pos):
 
 def on_attack(props):
     cur_sequence = props[0]
-    for cell in cur_sequence:
+    hero_cell = cur_sequence[len(cur_sequence) - 1:][0]
+    herx, hery = hero_cell.pos
+    hero = Hero.HeroClass((herx * BLOCK_SIZE + CENTER_MARGIN_X, hery * BLOCK_SIZE + CENTER_MARGIN_Y), (BLOCK_SIZE, BLOCK_SIZE))
+    all_sprites.add(hero)
+    grid[hery][herx] = Cell.CellClass(hero, (herx, hery))
+    for cell in cur_sequence[0:len(cur_sequence) - 1]:
         all_sprites.remove(cell.item)
         x, y = cell.pos
         enemy = Enemy.EnemyClass(random.randint(1, 4), (x * BLOCK_SIZE + CENTER_MARGIN_X, y * BLOCK_SIZE + CENTER_MARGIN_Y), (BLOCK_SIZE, BLOCK_SIZE))
         grid[y][x] = Cell.CellClass(enemy, (x, y))
         all_sprites.add(enemy)
 
-    cur_sequence = []
-
 def main():
     clock = pygame.time.Clock()
     
     cur_type = -1
     cur_position = (4, 5)
-    cur_sequence = [grid[5][4]]
     
     draw_grid(grid, cur_position)
+    
+    cur_sequence = [grid[5][4]]
+    cur_sequence_set = set(cur_sequence)
+    
+    heart_pos = [(250, 720), (250, 500), (250, 270)]    
 
     attack_btn = Button.ButtonClass((1350, 800), ATTACK_BTN, on_attack, font_attack.render("АТАКОВАТЬ", 1, (255, 255, 255)))
     lvl_label = font_lvl.render("УРОВЕНЬ 1", 1, (0, 0, 0))
@@ -81,8 +92,13 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
-                attack_btn.is_press(mx, my, [cur_sequence])
-                cur_sequence_set = set(cur_sequence)
+                if attack_btn.is_press(mx, my, [cur_sequence]):
+                    if len(cur_sequence) == 1:
+                        continue
+                    cur_type = -1
+                    x, y = cur_position
+                    cur_sequence = [grid[y][x]]
+                    cur_sequence_set = set(cur_sequence)
                 for cell in close_cells:
                     if not cell.is_mouse_over(mx, my): 
                         continue
@@ -109,6 +125,17 @@ def main():
             
         win.blit(MAIN_BG, (190, 100))
         win.blit(lvl_label, ((WIDTH / 2) - (lvl_label.get_rect().width / 2), 130))
+        win.blit(ORNAMENT, (1420, 150))
+        
+        count = 0
+        for pos in heart_pos:
+            if count < cur_sequence[0].item.hp:
+                count += 1
+                win.blit(HEART_FULL, pos)
+            else:
+                win.blit(HEART_LOST, pos)
+                
+        
         all_sprites.draw(win)
         
         for cell in close_cells:
