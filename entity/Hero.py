@@ -8,8 +8,9 @@ class HeroClass(pygame.sprite.Sprite):
         self.defend = False
         self.type = 0
         
+        self.COLOR = (125, 0, 0)
         self.image = pygame.Surface(size) #TODO:sprites
-        self.image.fill((125, 0, 0))
+        self.image.fill(self.COLOR)
         self.rect = self.image.get_rect() 
         self.rect.topleft = pos
         
