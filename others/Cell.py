@@ -1,18 +1,17 @@
 import pygame
 
 class CellClass(pygame.sprite.Sprite):
-    def __init__(self, item) -> None:
+    def __init__(self, item, pos) -> None:
         super().__init__()
         self.item = item
         self.rect = item.rect
+        self.pos = pos
     
-    def is_mouse_over(self, mx, my, cur_type):
-        self.rect.collidepoint(mx, my)
-        if self.item.type == cur_type:
-            #TODO:Animation
-            return True
+    def is_mouse_over(self, mx, my):
+        if self.rect.collidepoint(mx, my):
+                #TODO:Animation
+                return True
         return False
     
-    def update(self):
-        self.item.image.fill((0, 0, 0))
-        
+    def set_default(self):
+        self.item.image.fill(self.item.COLOR)

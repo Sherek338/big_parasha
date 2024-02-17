@@ -1,4 +1,5 @@
-def get_close(grid, posx, posy, row_count, col_count) -> list:
+def get_close(grid, pos, row_count, col_count) -> list:
+    posx, posy = pos
     close_cells = []
     
     dots = [{"x": posx - 1, "y": posy},

@@ -7,18 +7,20 @@ class EnemyClass(pygame.sprite.Sprite):
         
         self.image = pygame.Surface(size) # None
         
+        self.COLOR = None
         #TODO:sprites
         if self.type == 1:
-            self.image.fill((255, 0, 0))
+            self.COLOR = (255, 0, 0)
         if self.type == 2:
-            self.image.fill((0, 125, 0))
+            self.COLOR = (0, 125, 0)
         if self.type == 3:
-            self.image.fill((0, 0, 125))
+            self.COLOR = (0, 0, 125)
         if self.type == 4:
-            self.image.fill((255, 255, 255))
+            self.COLOR = (255, 255, 255)
         
+        self.image.fill(self.COLOR)
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
         
     def update(self):
-        pass
+        self.image = self.image
