@@ -9,7 +9,7 @@ class HeroClass(pygame.sprite.Sprite):
         
         self.is_angry = False
         self.COLOR = (125, 0, 0)
-        self.image = pygame.Surface(size) #TODO:sprites
+        self.image = pygame.image.load("./assets/image/animated/dynamic/hero/hero_!.png")
         self.image_selected = self.image
         self.image.fill(self.COLOR)
         self.rect = self.image.get_rect() 
