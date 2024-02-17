@@ -9,7 +9,6 @@ BLOCK_SIZE = WIDTH//COLS
 
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255), (0, 255, 255)]
 
-
 grid = [[random.choice(COLORS) for _ in range(COLS)] for _ in range(ROWS)]
 
 def draw_grid(win, grid):
