@@ -1,11 +1,17 @@
 import pygame
 import Events as Events
 
-class Hero:
-    def __init__(self):
+class HeroClass(pygame.sprite.Sprite):
+    def __init__(self, pos, size):
         super().__init__()
         self.hp = 3
         self.defend = False
+        self.type = 0
+        
+        self.image = pygame.Surface(size) #TODO:sprites
+        self.image.fill((125, 0, 0))
+        self.rect = self.image.get_rect() 
+        self.rect.topleft = pos
         
     def get_damage(self, damage):
         if self.defend:
@@ -16,4 +22,7 @@ class Hero:
             
     def death(self):
         #TODO:animation death
-        pygame.event.post(Events.DEADTH_EVENT)
+        pygame.event.post(pygame.event.Event(Events.DEADTH_EVENT))
+        
+    def update(self):
+        pass
