@@ -4,7 +4,7 @@ import random
 
 WIDTH, HEIGHT = 1920, 1080
 ROWS, COLS = 8, 8
-BLOCK_SIZE = WIDTH//COLS
+BLOCK_SIZE = 850//COLS
 
 
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255), (0, 255, 255)]
