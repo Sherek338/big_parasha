@@ -15,3 +15,5 @@ class ButtonClass(pygame.sprite.Sprite):
     def is_press(self, mx, my, props):
         if self.rect.collidepoint(mx, my):
             self.onclick(props)
+            return True
+        return False
