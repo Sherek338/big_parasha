@@ -18,10 +18,10 @@ def draw_grid(win, grid):
             pygame.draw.rect(win, color, (j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
 
 def main():
-    run = True
     clock = pygame.time.Clock()
     win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 
+    run = True
     while run:
         clock.tick(60)
 
@@ -31,7 +31,7 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pass  
-
+        
         draw_grid(win, grid)
         pygame.display.update()
 
