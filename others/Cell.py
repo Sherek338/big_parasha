@@ -14,4 +14,4 @@ class CellClass(pygame.sprite.Sprite):
         return False
     
     def set_default(self):
-        self.item.image.fill(self.item.COLOR)
+        self.item.image = self.item.image_reg

@@ -7,29 +7,31 @@ class EnemyClass(pygame.sprite.Sprite):
         self.type = type
         self.psevdo = 5
         self.is_angry = False
+        self.warn = pygame.image.load("./assets/image/animated/dynamic/attention/attention_2.png")
         
-        self.image = pygame.Surface(size) # None
+        self.image_reg = None
+        self.image_selected = None
         
-        self.COLOR = None
-        #TODO:sprites
+        if random.randint(0, 100) < self.psevdo:
+            self.psevdo = 0
+            self.is_angry = True
+            
         if self.type == 1:
-            self.COLOR = (255, 0, 0)
+            self.image_reg = pygame.image.load("./assets/image/animated/dynamic/light/light_1.png")
+            self.image_selected = pygame.image.load("./assets/image/animated/dynamic/light/light_2.png")
         if self.type == 2:
-            self.COLOR = (0, 125, 0)
+            self.image_reg = pygame.image.load("./assets/image/animated/dynamic/heavy/heavy_1.png")
+            self.image_selected = pygame.image.load("./assets/image/animated/dynamic/heavy/heavy_2.png")
         if self.type == 3:
-            self.COLOR = (0, 0, 125)
-        if self.type == 4:
-            self.COLOR = (255, 255, 255)
+            self.image_reg = pygame.image.load("./assets/image/animated/dynamic/boss/boss_1.png")
+            self.image_selected = pygame.image.load("./assets/image/animated/dynamic/boss/boss_2.png")
         
-        self.image.fill(self.COLOR)
+        self.image = self.image_reg
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
         
     def update(self):
-        self.image = self.image
-        if random.randint(0, 100) < self.psevdo:
-            self.psevdo = 0
-            self.is_angry = True
-            return
-        self.psevdo += 3
+        if self.is_angry:
+            self.image.blit(self.warn, (0, 0))
+        
         
