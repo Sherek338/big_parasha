@@ -117,11 +117,9 @@ settings_bg = pygame.image.load("assets\image\static\ctbg.png")
 exit_bg = pygame.image.load("assets\image\static\ctbg.png")
 
 play_rect = play_button.get_rect()
-play_rect.center = (400, 200)
-settings_rect = settings_button.get_rect()
-settings_rect.center = (400, 300)
+play_rect.center = (960, 600)
 exit_rect = exit_button.get_rect()
-exit_rect.center = (400, 400)
+exit_rect.center = (960, 700)
 
 
 while True:
