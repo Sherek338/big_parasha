@@ -8,12 +8,11 @@ class HeroClass(pygame.sprite.Sprite):
         self.type = 0
         
         self.is_angry = False
-        self.COLOR = (125, 0, 0)
-        self.image = pygame.image.load("./assets/image/animated/dynamic/hero/hero_!.png")
+        self.image = pygame.transform.scale(pygame.image.load("./assets/image/animated/dynamic/hero/hero_!.png"), (120, 120))
         self.image_selected = self.image
-        self.image.fill(self.COLOR)
         self.rect = self.image.get_rect() 
-        self.rect.topleft = pos
+        self.x, self.y = pos
+        self.rect.topleft = (self.x - 20, self.y -20)
         
     def get_damage(self, damage):
         if self.defend:
@@ -23,7 +22,6 @@ class HeroClass(pygame.sprite.Sprite):
             self.death()
             
     def death(self):
-        #TODO:animation death
         pygame.event.post(pygame.event.Event(Events.DEADTH_EVENT))
         
     def update(self):
