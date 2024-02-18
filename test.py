@@ -31,6 +31,7 @@
 
 import pygame
 import sys
+import os
 
 
 pygame.init()
@@ -98,9 +99,10 @@ pygame.init()
 
 screen = pygame.display.set_mode((1920, 1080))
 
-def new_func(calling):
-    my_calling = calling("index.py")
-    return my_calling
+def new_func():
+    pygame.mixer.music.stop()
+    os.system("py index.py")
+    pygame.mixer.music.play(100,0,0)
 
 
 
@@ -137,11 +139,8 @@ while True:
             if play_rect.collidepoint(mouse_x, mouse_y):
                 new_func()
             
-            if settings_rect.collidepoint(mouse_x, mouse_y):
-                pass
-            
             if exit_rect.collidepoint(mouse_x, mouse_y):
-                pass
+                sys.exit()
 
     
     screen.blit(background, (0, 0))
@@ -150,25 +149,20 @@ while True:
     mouse_x, mouse_y = pygame.mouse.get_pos()
 
     play_alpha = max(0, min(255, 255 - (mouse_x - play_rect.centerx)**2, - (mouse_y - play_rect.centery)**2))
-    settings_alpha = max(0, min(255, 255 - (mouse_x - settings_rect.centerx)**2, - (mouse_y - settings_rect.centery)**2))
     exit_alpha = max(0, min(255, 255 - (mouse_x - exit_rect.centerx)**2, - (mouse_y - exit_rect.centery)**2))
 
     
     play_bg_copy = play_bg.copy()
     play_bg_copy.set_alpha(play_alpha)
-    settings_bg_copy = settings_bg.copy()
-    settings_bg_copy.set_alpha(settings_alpha)
     exit_bg_copy = exit_bg.copy()
     exit_bg_copy.set_alpha(exit_alpha)
 
     
     screen.blit(play_bg_copy, play_rect)
-    screen.blit(settings_bg_copy, settings_rect)
     screen.blit(exit_bg_copy, exit_rect)
 
     
     screen.blit(play_button, play_rect)
-    screen.blit(settings_button, settings_rect)
     screen.blit(exit_button, exit_rect)
 
     pygame.display.flip()

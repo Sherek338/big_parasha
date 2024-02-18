@@ -6,6 +6,7 @@ import entity.Enemy as Enemy
 import others.Cell as Cell
 import others.Close as Close
 import others.Button as Button
+import sys
 
 
 WIDTH, HEIGHT = 1920, 1080
@@ -18,12 +19,12 @@ pygame.init()
 pygame.font.init()
 pygame.display.init()
 
-win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
+win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE )
 
 LVL_MUSIC = pygame.mixer.music.load("./assets/ost/lvl_theme.wav")
 pygame.mixer.music.play(100, 0, 0)
 
-MAIN_BG = pygame.transform.scale(pygame.image.load("./assets/sprites/main_bg.png").convert(), (1550, 900))
+MAIN_BG = pygame.transform.scale(pygame.image.load("./assets/sprites/bg.png").convert(), (1550, 900))
 ATTACK_BTN = pygame.image.load("./assets/sprites/attack_btn.png").convert_alpha()
 ORNAMENT = pygame.image.load("./assets/sprites/orn.png").convert_alpha()
 HEART_FULL = pygame.image.load("./assets/sprites/HP_FULL.png").convert_alpha()
@@ -65,6 +66,9 @@ def on_attack(props):
         enemy = Enemy.EnemyClass(random.randint(1, 3), (x * BLOCK_SIZE + CENTER_MARGIN_X, y * BLOCK_SIZE + CENTER_MARGIN_Y), (BLOCK_SIZE, BLOCK_SIZE))
         grid[y][x] = Cell.CellClass(enemy, (x, y))
         all_sprites.add(enemy)
+        
+def exit(props):
+    sys.exit()
 
 def main():
     clock = pygame.time.Clock()
@@ -93,7 +97,7 @@ def main():
     game_over_label = font_attack.render("Game Over", 1, (0,0,0))
     main_menu_btn_rect = pygame.Surface((300, 100))
     main_menu_btn_rect.fill((250,238,203))
-    main_menu_btn =  Button.ButtonClass((810, 550), main_menu_btn_rect, lambda props : None, font_attack.render("Главное меню", 1, (0,0,0)))
+    main_menu_btn =  Button.ButtonClass((810, 550), main_menu_btn_rect, exit, font_attack.render("Главное меню", 1, (0,0,0)))
     btnGroup.add(main_menu_btn)
     
     close_cells = Close.get_close(grid, cur_position, ROWS, COLS)
@@ -104,16 +108,21 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    run = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
-                main_menu_btn.is_press(mx, my, [])
+                if not can_play:
+                    main_menu_btn.is_press(mx, my, [])
                 if can_play:
                     if attack_btn.is_press(mx, my, [cur_sequence]):
                         cur_type = -1
                         x, y = cur_position
                         cur_sequence = [grid[y][x]]
                         cur_sequence_set = set(cur_sequence)
+                        close_cells = Close.get_close(grid, cur_position, ROWS, COLS)
                         for cell in close_cells:
                             if cell.item.is_angry:
                                 hp -= 1
@@ -132,7 +141,7 @@ def main():
                             cur_sequence_set.add(cell)
                             close_cells = Close.get_close(grid, cur_position, ROWS, COLS)
             if event.type == Events.DEADTH_EVENT:
-                cur_sequence[0].item.image = pygame.image.load()
+                cur_sequence[0].item.image = pygame.image.load("./assets/image/animated/dynamic/hero/hero_3.png")
                 can_play = False
             
         win.blit(MAIN_BG, (190, 100))
