@@ -31,13 +31,77 @@
 
 import pygame
 import sys
-import call
 
 
 pygame.init()
 
+LVL_MUSIC = pygame.mixer.music.load("./assets/ost/Main_theme.wav")
+pygame.mixer.music.play(100,0,0)
 
-screen = pygame.display.set_mode((800, 600))
+class calling:
+    
+    def init(self, files):
+        
+        self.files = files
+        
+        self.states = {}
+       
+        for file in self.files:
+            self.states[file] = False
+
+    
+    def run(self, file):
+        
+        if file in self.files:
+            
+            if not self.states[file]:
+                
+                exec(open(file).read())
+                
+                self.states[file] = True
+            else:
+                
+                print(f"{file} is already running.")
+        else:
+            
+            print(f"{file} is not in the list of files.")
+
+    
+    def close(self, file):
+        
+        if file in self.files:
+            
+            if self.states[file]:
+                
+                pygame.quit()
+                
+                self.states[file] = False
+            else:
+                
+                print(f"{file} is not running.")
+        else:
+            
+            print(f"{file} is not in the list of files.")
+
+    
+    def check(self):
+        
+        running_files = []
+        
+        for file in self.files:
+            
+            if self.states[file]:
+                running_files.append(file)
+        
+        return running_files
+pygame.init()
+
+screen = pygame.display.set_mode((1920, 1080))
+
+def new_func(calling):
+    my_calling = calling("index.py")
+    return my_calling
+
 
 
 background = pygame.image.load("assets\image\static\mainmenubg.png")
@@ -46,9 +110,9 @@ settings_button = pygame.image.load("assets\image\static\settingbutton.png")
 exit_button = pygame.image.load("assets\image\static\exitbutton.png")
 
 
-play_bg = pygame.image.load("assets\image\static\btbg.png")
-settings_bg = pygame.image.load("assets\image\static\btbg.png")
-exit_bg = pygame.image.load("assets\image\static\btbg.png")
+play_bg = pygame.image.load("assets\image\static\ctbg.png")
+settings_bg = pygame.image.load("assets\image\static\ctbg.png")
+exit_bg = pygame.image.load("assets\image\static\ctbg.png")
 
 play_rect = play_button.get_rect()
 play_rect.center = (400, 200)
@@ -71,13 +135,13 @@ while True:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             
             if play_rect.collidepoint(mouse_x, mouse_y):
-                calling.game()
+                new_func()
             
             if settings_rect.collidepoint(mouse_x, mouse_y):
-                calling.settings()
+                pass
             
             if exit_rect.collidepoint(mouse_x, mouse_y):
-                calling.exit()
+                pass
 
     
     screen.blit(background, (0, 0))
@@ -85,9 +149,9 @@ while True:
     
     mouse_x, mouse_y = pygame.mouse.get_pos()
 
-    play_alpha = max(0, min(255, 255 - (mouse_x - play_rect.centerx)2 - (mouse_y - play_rect.centery)2))
-    settings_alpha = max(0, min(255, 255 - (mouse_x - settings_rect.centerx)2 - (mouse_y - settings_rect.centery)2))
-    exit_alpha = max(0, min(255, 255 - (mouse_x - exit_rect.centerx)2 - (mouse_y - exit_rect.centery)2))
+    play_alpha = max(0, min(255, 255 - (mouse_x - play_rect.centerx)**2, - (mouse_y - play_rect.centery)**2))
+    settings_alpha = max(0, min(255, 255 - (mouse_x - settings_rect.centerx)**2, - (mouse_y - settings_rect.centery)**2))
+    exit_alpha = max(0, min(255, 255 - (mouse_x - exit_rect.centerx)**2, - (mouse_y - exit_rect.centery)**2))
 
     
     play_bg_copy = play_bg.copy()
