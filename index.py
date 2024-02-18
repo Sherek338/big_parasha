@@ -85,7 +85,16 @@ def main():
     
     all_sprites.add(attack_btn)
     
+    btnGroup = pygame.sprite.Group()
+    
     can_play = True
+    game_over_rect = pygame.Surface((500, 300))
+    game_over_rect.fill((249,224,193))
+    game_over_label = font_attack.render("Game Over", 1, (0,0,0))
+    main_menu_btn_rect = pygame.Surface((300, 100))
+    main_menu_btn_rect.fill((250,238,203))
+    main_menu_btn =  Button.ButtonClass((810, 550), main_menu_btn_rect, lambda props : None, font_attack.render("Главное меню", 1, (0,0,0)))
+    btnGroup.add(main_menu_btn)
     
     close_cells = Close.get_close(grid, cur_position, ROWS, COLS)
     run = True
@@ -97,32 +106,33 @@ def main():
                 run = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if not can_play:
-                    return
                 mx, my = pygame.mouse.get_pos()
-                if attack_btn.is_press(mx, my, [cur_sequence]):
-                    cur_type = -1
-                    x, y = cur_position
-                    cur_sequence = [grid[y][x]]
-                    cur_sequence_set = set(cur_sequence)
+                main_menu_btn.is_press(mx, my, [])
+                if can_play:
+                    if attack_btn.is_press(mx, my, [cur_sequence]):
+                        cur_type = -1
+                        x, y = cur_position
+                        cur_sequence = [grid[y][x]]
+                        cur_sequence_set = set(cur_sequence)
+                        for cell in close_cells:
+                            if cell.item.is_angry:
+                                hp -= 1
+                                if hp <= 0:
+                                    pygame.event.post(pygame.event.Event(Events.DEADTH_EVENT)) 
                     for cell in close_cells:
-                        if cell.item.is_angry:
-                            hp -= 1
-                            if hp <= 0:
-                                pygame.event.post(pygame.event.Event(Events.DEADTH_EVENT)) 
-                for cell in close_cells:
-                    if not cell.is_mouse_over(mx, my): 
-                        continue
-                    if cell in cur_sequence_set:
-                        continue
-                    if cur_type == cell.item.type or cur_type == -1: 
-                        cell.item.image = cell.item.image_selected
-                        cur_type = cell.item.type
-                        cur_position = cell.pos
-                        cur_sequence.append(cell)
-                        cur_sequence_set.add(cell)
-                        close_cells = Close.get_close(grid, cur_position, ROWS, COLS)
+                        if not cell.is_mouse_over(mx, my): 
+                            continue
+                        if cell in cur_sequence_set:
+                            continue
+                        if cur_type == cell.item.type or cur_type == -1: 
+                            cell.item.image = cell.item.image_selected
+                            cur_type = cell.item.type
+                            cur_position = cell.pos
+                            cur_sequence.append(cell)
+                            cur_sequence_set.add(cell)
+                            close_cells = Close.get_close(grid, cur_position, ROWS, COLS)
             if event.type == Events.DEADTH_EVENT:
+                cur_sequence[0].item.image = pygame.image.load()
                 can_play = False
             
         win.blit(MAIN_BG, (190, 100))
@@ -136,7 +146,6 @@ def main():
                 win.blit(HEART_FULL, pos)
             else:
                 win.blit(HEART_LOST, pos)
-                
         
         all_sprites.draw(win)
         
@@ -145,6 +154,11 @@ def main():
                 cell.item.image = cell.item.image_selected
         
         all_sprites.update()
+        
+        if not can_play:
+            win.blit(game_over_rect, (710, 450))
+            win.blit(game_over_label, (870, 470))
+            btnGroup.draw(win)
         
         pygame.display.update()
     pygame.quit()
